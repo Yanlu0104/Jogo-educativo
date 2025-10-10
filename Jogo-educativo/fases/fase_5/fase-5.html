@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Agrupando Formas Geométricas - Drag and Drop</title>
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <style>
+    body { font-family:'Comic Sans MS',cursive,sans-serif; background:#f0f0f0; margin:0; }
+    h2 { text-align:center; margin-top:24px; }
+    .drop-zones-container { display:flex;justify-content:center;gap:38px;margin:30px 0 10px 0; }
+    .dropzone-box {
+      width:140px; min-height:210px; background:#fff;
+      border:2px solid #333; border-radius:18px; margin:0 8px;
+      display:flex;flex-direction:column;align-items:center;
+      box-shadow:1px 1px 10px #ccc; position:relative;
+    }
+    .forma-icone {
+      width:60px; height:60px; margin:12px 0 14px 0;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .forma-icone.circle { border-radius:50%; background:#f44336;}
+    .forma-icone.square { background:#2196f3;}
+    .forma-icone.triangle { 
+      width:0; height:0; background:none;
+      border-left:30px solid transparent;
+      border-right:30px solid transparent;
+      border-bottom:60px solid #ffd600;
+      margin-left:0;
+      margin:0;
+    }
+    .titulo-forma { font-weight:bold; margin-bottom:10px; font-size:1.12em;}
+    .dropzone {
+      flex:1;width:90%;min-height:110px; margin-bottom:12px;
+      border:2px dashed #bbb; border-radius:11px;
+      display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;padding:8px;
+      background:#fafafa;
+      transition:.2s border-color;
+    }
+    .dropzone.over { border-color: #43a047;}
+    .contador { font-size:1.12em;color:#444;margin-bottom:2px;margin-top:0;}
+    .itens-lista {
+      display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;
+    }
+    .img-draggable {
+      width:58px;height:58px;
+      border:2px solid #333; background:#fff; border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:grab;box-shadow:2px 2px 10px #ccc;
+      margin-bottom:8px;transition:box-shadow .2s;
+      margin-left:3px;margin-right:2px; margin-top:0;
+    }
+    .img-draggable.dragging { box-shadow:2px 2px 16px #2196f3; }
+    .img-draggable img{width:46px;height:46px;}
+  </style>
+</head>
+<body>
+  <h2>Arraste cada forma para a caixa correta e acompanhe a contagem!</h2>
+  
+  <div class="drop-zones-container">
+    <div class="dropzone-box">
+      <div class="forma-icone circle"></div>
+      <div class="titulo-forma">Círculo</div>
+      <div class="dropzone" data-shape="circle"></div>
+      <div class="contador" id="count-circle">0 itens</div>
+    </div>
+    <div class="dropzone-box">
+      <div class="forma-icone square"></div>
+      <div class="titulo-forma">Quadrado</div>
+      <div class="dropzone" data-shape="square"></div>
+      <div class="contador" id="count-square">0 itens</div>
+    </div>
+    <div class="dropzone-box">
+      <div class="forma-icone triangle"></div>
+      <div class="titulo-forma">Triângulo</div>
+      <div class="dropzone" data-shape="triangle"></div>
+      <div class="contador" id="count-triangle">0 itens</div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;">
+    <div class="itens-lista">
+      <!-- Formas geométricas arrastáveis (podem se repetir): -->
+      <div class="img-draggable" data-shape="circle">
+        <div class="forma-icone circle"></div>
+      </div>
+      <div class="img-draggable" data-shape="square">
+        <div class="forma-icone square"></div>
+      </div>
+      <div class="img-draggable" data-shape="triangle">
+        <div class="forma-icone triangle"></div>
+      </div>
+      <div class="img-draggable" data-shape="circle">
+        <div class="forma-icone circle"></div>
+      </div>
+      <div class="img-draggable" data-shape="square">
+        <div class="forma-icone square"></div>
+      </div>
+      <div class="img-draggable" data-shape="triangle">
+        <div class="forma-icone triangle"></div>
+      </div>
+      <div class="img-draggable" data-shape="circle">
+        <div class="forma-icone circle"></div>
+      </div>
+      <div class="img-draggable" data-shape="triangle">
+        <div class="forma-icone triangle"></div>
+      </div>
+      <div class="img-draggable" data-shape="square">
+        <div class="forma-icone square"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+interact('.img-draggable').draggable({
+  inertia: false,
+  listeners: {
+    move: dragMoveListener,
+    end(event) {
+      event.target.classList.remove('dragging');
+    }
+  }
+});
+function dragMoveListener(event) {
+  const target = event.target;
+  let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+  let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+  target.style.transform = `translate(${x}px, ${y}px)`;
+  target.setAttribute('data-x', x);
+  target.setAttribute('data-y', y);
+  target.classList.add('dragging');
+}
+
+interact('.dropzone').dropzone({
+  accept: '.img-draggable',
+  overlap: 0.6,
+  ondragenter(event) { event.target.classList.add('over'); },
+  ondragleave(event) { event.target.classList.remove('over'); },
+  ondrop(event) {
+    const shape = event.target.getAttribute('data-shape');
+    const imgShape = event.relatedTarget.getAttribute('data-shape');
+    if (shape === imgShape) {
+      event.relatedTarget.style.transform = "";
+      event.relatedTarget.setAttribute('data-x',0);
+      event.relatedTarget.setAttribute('data-y',0);
+      event.target.appendChild(event.relatedTarget);
+      updateContadores();
+    }
+    event.target.classList.remove('over');
+  }
+});
+
+function updateContadores() {
+  ['circle','square','triangle'].forEach(shape=>{
+    let cnt = document.querySelector(`.dropzone[data-shape="${shape}"]`).childElementCount;
+    document.getElementById(`count-${shape}`).textContent =
+      `${cnt} item${cnt===1?'':'s'}`;
+  });
+}
+
+document.querySelectorAll('.img-draggable').forEach(el=>{
+  el.addEventListener('dblclick',function(){
+    document.querySelector('.itens-lista').appendChild(this);
+    this.style.transform = "";
+    this.setAttribute('data-x',0); this.setAttribute('data-y',0);
+    this.classList.remove('dragging');
+    updateContadores();
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Agrupamento de Formas - Drag and Drop</title>
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <style>
+    body { font-family:'Comic Sans MS',cursive,sans-serif; background:#f0f0f0; }
+    h2 { text-align:center; }
+    .container { display:flex;justify-content:center;gap:40px;margin-top:20px; }
+    .formas, .imgs { display:flex;flex-direction:column;align-items:center;gap:25px; }
+    .forma-alvo {
+      width:110px; height:110px; border:2px dashed #aaa; margin-bottom:10px;
+      display:flex;align-items:center;justify-content:center;
+      background:#fff;
+    }
+    .forma-alvo[data-shape="circle"] { border-radius:50%; }
+    .forma-alvo[data-shape="triangle"]::before {
+      content:""; display:block; border-left:55px solid transparent;
+      border-right:55px solid transparent; border-bottom:95px solid #e53935;
+      margin-top:-24px; margin-left:-25px;
+    }
+    .forma-alvo[data-shape="triangle"] { background:none; border:none; }
+    .forma-alvo[data-shape="square"] { }
+    .forma-titulo {text-align:center;font-weight:bold;}
+
+    .img-draggable {
+      width:80px; height:80px;
+      border:2px solid #333; background:#fff; border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:grab; box-shadow:2px 2px 10px #bbb;
+      margin-bottom:10px; transition:box-shadow .2s;
+    }
+    .img-draggable.dragging { box-shadow:2px 2px 16px #2196f3; }
+  </style>
+</head>
+<body>
+  <h2>Agrupe cada objeto com a forma correspondente</h2>
+  <div class="container">
+    <!-- Formas geométricas -->
+    <div class="formas">
+      <div class="forma-titulo">Círculo</div>
+      <div class="forma-alvo" data-shape="circle"></div>
+      <div class="forma-titulo">Triângulo</div>
+      <div class="forma-alvo" data-shape="triangle"></div>
+      <div class="forma-titulo">Quadrado</div>
+      <div class="forma-alvo" data-shape="square"></div>
+    </div>
+    <!-- Elementos arrastáveis -->
+    <div class="imgs">
+      <div class="img-draggable" data-shape="circle" id="img-bola" style="background:none;">
+        <img src="https://img.icons8.com/color/96/000000/football2.png" alt="Bola" width="70">
+      </div>
+      <div class="img-draggable" data-shape="triangle" id="img-chapeu" style="background:none;">
+        <img src="https://img.icons8.com/color/96/000000/party-hat.png" alt="Chapéu de festa" width="65">
+      </div>
+      <div class="img-draggable" data-shape="square" id="img-cubo" style="background:none;">
+        <img src="https://img.icons8.com/color/96/000000/rubiks-cube.png" alt="Cubo Mágico" width="65">
+      </div>
+      <div class="img-draggable" data-shape="circle" id="img-pizza" style="background:none;">
+        <img src="https://img.icons8.com/color/96/000000/pizza.png" alt="Pizza" width="65">
+      </div>
+    </div>
+  </div>
+
+<script>
+// torando as imgs arrastáveis e droppáveis
+interact('.img-draggable').draggable({
+  listeners: {
+    move (event) {
+      const target = event.target;
+      // move elemento
+      target.style.transform =
+        `translate(${(parseFloat(target.getAttribute('data-x'))||0)+event.dx}px, ${(parseFloat(target.getAttribute('data-y'))||0)+event.dy}px)`;
+      target.setAttribute('data-x', (parseFloat(target.getAttribute('data-x'))||0)+event.dx);
+      target.setAttribute('data-y', (parseFloat(target.getAttribute('data-y'))||0)+event.dy);
+      target.classList.add('dragging');
+    },
+    end (event) { event.target.classList.remove('dragging'); }
+  }
+});
+
+interact('.forma-alvo').dropzone({
+  accept: '.img-draggable',
+  overlap: 0.55,
+  ondragenter(event) {
+    event.target.style.background = "#c5e1a5";
+  },
+  ondragleave(event) {
+    event.target.style.background = "#fff";
+  },
+  ondrop(event) {
+    const alvoShape = event.target.getAttribute('data-shape');
+    const imgShape = event.relatedTarget.getAttribute('data-shape');
+    if (alvoShape === imgShape) {
+      // fixa imagem na target
+      event.relatedTarget.style.transform = "";
+      event.relatedTarget.setAttribute('data-x',0);
+      event.relatedTarget.setAttribute('data-y',0);
+      event.target.appendChild(event.relatedTarget);
+      event.target.style.background = "#a5d6a7";
+    } 
+    setTimeout(()=>{event.target.style.background="#fff";},800);
+  }
+});
+</script>
+</body>
+</html>

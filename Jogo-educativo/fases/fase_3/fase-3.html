@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ábaco Suanpan Educativo - Permutação Completo</title>
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <style>
+    * {margin:0;padding:0;box-sizing:border-box;}
+    body {
+      font-family:'Comic Sans MS',cursive,sans-serif;
+      background:linear-gradient(135deg,#e0f7fa,#bbdefb);
+      min-height:100vh;padding:20px;color:#333;
+    }
+    .container {
+      max-width:800px;margin:0 auto;
+      background-color:rgba(255,255,255,0.95);
+      border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);
+      padding:20px;border:8px solid #5d4037;
+    }
+    h1 {
+      text-align:center;color:#5d4037;
+      margin-bottom:20px;font-size:2.5rem;
+      text-shadow:2px 2px 0px #ffd54f;
+    }
+    .abaco-container {
+      display:flex;flex-direction:column;align-items:center;
+      margin:20px 0;padding:20px;background:#8d6e63;
+      border-radius:15px;box-shadow:inset 0 0 15px rgba(0,0,0,0.3);
+    }
+    .valor-total {
+      font-size:2.5rem;font-weight:bold;color:#5d4037;
+      text-shadow:2px 2px 0 #ffd54f;margin-bottom:15px;
+    }
+    .abaco-frame {
+      display:flex;gap:60px;padding:20px;
+      background:#a1887f;border-radius:10px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    }
+    .haste-container {display:flex;flex-direction:column;align-items:center;}
+    .haste-label {
+      font-size:1.5rem;font-weight:bold;margin-bottom:10px;
+      color:white;text-shadow:1px 1px 0 #5d4037;
+    }
+    .haste {
+      position:relative;width:80px;height:300px;
+      background:linear-gradient(to right,#5d4037,#6d4c41,#5d4037);
+      border-radius:8px;box-shadow:3px3px10px rgba(0,0,0,0.3);
+      display:flex;flex-direction:column;justify-content:space-between;
+      padding:10px 0;border:2px solid transparent;
+      transition:border-color 0.3s ease;
+    }
+    .haste.drag-over {
+      border-color:#ffeb3b;
+      box-shadow:0 0 15px rgba(255,235,59,0.5) inset;
+    }
+    .barra-central {
+      position:absolute;top:50%;left:0;right:0;height:6px;
+      background:#3e2723;transform:translateY(-50%);z-index:1;
+    }
+    .contas-superiores,.contas-inferiores {
+      display:flex;flex-direction:column;align-items:center;
+      gap:8px;margin-bottom:10px;position:relative;z-index:2;
+    }
+    .conta {
+      width:60px;height:25px;border-radius:12px;
+      cursor:grab;display:flex;align-items:center;justify-content:center;
+      font-weight:bold;user-select:none;
+      transition:transform 0.3s ease,box-shadow 0.3s ease,z-index 0.3s ease;
+      position:relative;z-index:2;
+    }
+    .conta:active {cursor:grabbing;}
+    .conta.superior {
+      background:linear-gradient(to bottom,#ff5252,#d32f2f);
+      color:white;border:2px solid #b71c1c;text-shadow:1px 1px 0 #000;
+    }
+    .conta.inferior {
+      background:linear-gradient(to bottom,#42a5f5,#1976d2);
+      color:white;border:2px solid #0d47a1;text-shadow:1px 1px 0 #000;
+    }
+    .conta.ativa {box-shadow:0 5px 8px rgba(0,0,0,0.4);z-index:10;}
+    .conta.dragging {z-index:15;box-shadow:0 8px 15px rgba(0,0,0,0.6);}
+    .haste-value {
+      width:60px;min-height:40px;font-size:2rem;font-weight:bold;
+      margin-top:10px;color:#ffd54f;background:#5d4037;
+      padding:5px;border-radius:10px;text-align:center;
+      text-shadow:1px 1px 0px #3e2723;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ábaco Suanpan Educativo</h1>
+    <div class="abaco-container">
+      <div class="valor-total">Valor Total: <span id="valor-total">0</span></div>
+      <div class="abaco-frame" id="abaco-frame">
+        <!-- Dezenas -->
+        <div class="haste-container">
+          <div class="haste-label">Dezenas</div>
+          <div class="haste" id="haste-dezenas">
+            <div class="barra-central"></div>
+            <div class="contas-superiores">
+              <div class="conta superior" data-value="5" data-y="0">5</div>
+            </div>
+            <div class="contas-inferiores">
+              <div class="conta inferior" data-value="1" data-y="0">1</div>
+              <div class="conta inferior" data-value="1" data-y="0">1</div>
+              <div class="conta inferior" data-value="1" data-y="0">1</div>
+              <div class="conta inferior" data-value="1" data-y="0">1</div>
+            </div>
+          </div>
+          <div class="haste-value" id="valor-dezenas">0</div>
+        </div>
+        <!-- Unidades -->
+        <div class="haste-container">
+          <div class="haste-label">Unidades</div>
+          <div class="haste" id="haste-unidades">
+            <div class="barra-central"></div>
+            <div class="contas-superiores">
+              <div class="conta superior" data-value="5" data-y="0">5</div>
+            </div>
+            <div class="contas-inferiores">
+              <div class="conta inferior" data-value="1" data-y="0">1</div>
+              <div class="conta inferior" data-value="1" data-y="0">1</div>
+              <div class="conta inferior" data-value="1" data-y="0">1</div>
+              <div class="conta inferior" data-value="1" data-y="0">1</div>
+            </div>
+          </div>
+          <div class="haste-value" id="valor-unidades">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // ===== CONFIGURAÇÕES GLOBAIS =====
+    const CONFIG = {
+      LIMITE_SUPERIOR_ATIVAR: 25,
+      LIMITE_INFERIOR_ATIVAR: 25,
+      POSICAO_SUPERIOR_ATIVA: 70,
+      POSICAO_INFERIOR_ATIVA: -80,
+      MARGEM_PERMUTACAO: 25,
+      DELAY_MOVIMENTO: 650
+    };
+
+    let estadoAbaco = {
+      dezenas: 0,
+      unidades: 0,
+      total: 0
+    };
+
+    // ===== FUNÇÃO DE PERMUTAÇÃO - EVITA SOBREPOSIÇÃO =====
+    function snapPermutacao(contaAtual, novaY) {
+      const haste = contaAtual.closest('.haste');
+      const todasContas = Array.from(haste.querySelectorAll('.conta')).filter(conta => conta !== contaAtual);
+      const tipoConta = contaAtual.classList.contains('superior') ? 'superior' : 'inferior';
+      // Filtra apenas contas do mesmo tipo (superior ou inferior)
+      const contasMesmoTipo = todasContas.filter(conta => conta.classList.contains(tipoConta));
+
+      // Verifica colisão com cada conta do mesmo tipo
+      for (let outraConta of contasMesmoTipo) {
+        const outraY = parseFloat(outraConta.getAttribute('data-y')) || 0;
+        const distancia = Math.abs(novaY - outraY);
+
+        // Se muito próximas, ajusta posição para evitar sobreposição
+        if (distancia < CONFIG.MARGEM_PERMUTACAO) {
+          if (novaY > outraY) {
+            novaY = outraY + CONFIG.MARGEM_PERMUTACAO;
+          } else {
+            novaY = outraY - CONFIG.MARGEM_PERMUTACAO;
+          }
+        }
+      }
+
+      // Ajuste para superiores (haste 5) e inferiores
+      if (tipoConta === 'superior') {
+        novaY = Math.max(0, Math.min(novaY, 30));
+      } else {
+        novaY = Math.max(-120, Math.min(novaY, 0));
+      }
+
+      return novaY;
+    }
+
+    // ===== ATUALIZAR ESTADO DA CONTA - CORRIGIDO ESPECIALMENTE PARA O 5 =====
+    function atualizarEstadoConta(conta) {
+      const tipoConta = conta.classList.contains('superior') ? 'superior' : 'inferior';
+      const posY = parseFloat(conta.getAttribute('data-y') || 0);
+
+      let isAtiva;
+      let posFinal;
+
+      // Função de ativar/desativar haste 5 (superior)
+      if (tipoConta === 'superior') {
+        // Se arrastar para cima, ativa; se arrastar para baixo, desativa
+        if (posY > CONFIG.LIMITE_SUPERIOR_ATIVAR) {
+          isAtiva = true;
+          posFinal = CONFIG.POSICAO_SUPERIOR_ATIVA;
+        } else {
+          isAtiva = false;
+          posFinal = 0;
+        }
+        conta.style.transform = `translateY(${posFinal}px)`;
+        conta.setAttribute('data-y', posFinal);
+
+        // Ativa ou desativa visualmente
+        if (isAtiva) {
+          conta.classList.add('ativa');
+        } else {
+          conta.classList.remove('ativa');
+        }
+      } else {
+        // Mantém lógica original para contas inferiores
+        isAtiva = posY < CONFIG.LIMITE_INFERIOR_ATIVAR;
+        posFinal = isAtiva ? CONFIG.POSICAO_INFERIOR_ATIVA : 0;
+        conta.style.transform = `translateY(${posFinal}px)`;
+        conta.setAttribute('data-y', posFinal);
+
+        if (isAtiva) {
+          conta.classList.add('ativa');
+        } else {
+          conta.classList.remove('ativa');
+        }
+      }
+    }
+
+    function calcularValorTotal() {
+      let dezenas = 0;
+      let unidades = 0;
+
+      document.querySelectorAll('.haste').forEach(haste => {
+        const hasteId = haste.id;
+        const contasSuperiores = haste.querySelectorAll('.conta.superior.ativa');
+        const contasInferiores = haste.querySelectorAll('.conta.inferior.ativa');
+
+        // Calcula valores: superiores = 5 cada, inferiores = 1 cada
+        const valorSuperiores = contasSuperiores.length * 5;
+        const valorInferiores = contasInferiores.length * 1;
+        const valorTotal = valorSuperiores + valorInferiores;
+
+        if (hasteId === 'haste-dezenas') {
+          dezenas = valorTotal;
+        } else if (hasteId === 'haste-unidades') {
+          unidades = valorTotal;
+        }
+      });
+
+      estadoAbaco = {
+        dezenas: dezenas,
+        unidades: unidades,
+        total: (dezenas * 10) + unidades
+      };
+
+      document.getElementById('valor-total').textContent = estadoAbaco.total;
+      document.getElementById('valor-dezenas').textContent = estadoAbaco.dezenas;
+      document.getElementById('valor-unidades').textContent = estadoAbaco.unidades;
+    }
+
+    interact('.conta').draggable({
+      modifiers: [
+        interact.modifiers.restrict({
+          restriction: 'parent',
+          elementRect: { top: 10, left: 10, bottom: 10, right: 10 },
+          endOnly: true
+        })
+      ],
+      axis: 'y',
+      inertia: false,
+      autoScroll: false,
+      listeners: {
+        start: function(event) {
+          event.target.style.transition = 'none';
+          event.target.classList.add('dragging');
+          const haste = event.target.closest('.haste');
+          if (haste) {
+            haste.classList.add('drag-over');
+          }
+        },
+        move: function(event) {
+          const target = event.target;
+          let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+          // Aplica sistema de permutação para evitar sobreposição
+          y = snapPermutacao(target, y);
+
+          // Aplica transformação
+          target.style.transform = `translateY(${y}px)`;
+          target.setAttribute('data-y', y);
+        },
+        end: function(event) {
+          const target = event.target;
+          target.classList.remove('dragging');
+          const haste = target.closest('.haste');
+          if (haste) {
+            haste.classList.remove('drag-over');
+          }
+
+          setTimeout(() => {
+            target.style.transition = `transform ${CONFIG.DELAY_MOVIMENTO}ms ease`;
+            atualizarEstadoConta(target);
+            calcularValorTotal();
+          }, 50);
+        }
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.conta').forEach(conta => {
+        conta.setAttribute('data-y', 0);
+        conta.style.transform = 'translateY(0px)';
+      });
+
+      calcularValorTotal();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adição com Drag & Drop</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <h2>Adição com Drag & Drop</h2>
+
+  <!-- Números arrastáveis -->
+  <div class="results">
+    <p><span draggable="true">2</span></p>
+    <p><span draggable="true">4</span></p>
+    <p><span draggable="true">6</span></p>
+  </div>
+
+  <!-- Operação -->
+  <div class="operation">
+    <p>2</p>
+    <span>+</span>
+    <p>2</p>
+    <span>=</span>
+    <p class="res-container">
+      <span id="res" dropzone="true"></span>
+    </p>
+  </div>
+
+  <!-- Botão -->
+  <button class="button">Recomeçar</button>
+</body>
+</html>
