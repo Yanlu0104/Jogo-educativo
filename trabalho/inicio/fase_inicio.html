@@ -606,16 +606,9 @@
             /**
              * Função que lida com o clique no botão "Começar o Jogo!" (final da história).
              */
-            function iniciarJogoDeVerdade() {
-                areaHistoria.style.animation = 'fadeOutUp 0.5s ease-in forwards';
-                
-                setTimeout(() => {
-                    areaHistoria.style.display = 'none';
-                    areaJogoReal.style.display = 'flex'; 
-                    areaJogoReal.style.animation = 'fadeInDown 0.5s ease-out forwards';
-                    nomeJogadorJogo.textContent = nomeDoJogador;
-                }, 500);
-            }
+          function iniciarJogoDeVerdade() {
+    window.location.href = "Menu_fases.html";
+}
 
             // Listeners de Eventos
             btnComecarRegistro.addEventListener('click', iniciarRegistro);
